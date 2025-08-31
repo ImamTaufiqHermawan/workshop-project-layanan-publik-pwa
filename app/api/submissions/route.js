@@ -4,7 +4,6 @@ import {
   normalizePhoneNumber,
   isValidIndonesianMobile,
 } from "../../../lib/phone";
-import { v4 as uuidv4 } from "uuid";
 
 // Initialize database on first request
 let dbInitialized = false;
