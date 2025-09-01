@@ -14,11 +14,31 @@ const initDB = async () => {
   }
 };
 
+// Handle CORS preflight
+export async function OPTIONS() {
+  console.log("🔍 OPTIONS request received at /api/submissions");
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
+
+// Handle POST - Create new submission
 export async function POST(request) {
+  console.log("🔍 POST request received at /api/submissions");
+  console.log("🔍 Request method:", request.method);
+  console.log("🔍 Request URL:", request.url);
+
   try {
     await initDB();
 
     const body = await request.json();
+    console.log("Request body:", body);
+
     const { nama, nik, email, no_wa, jenis_layanan, consent } = body;
 
     // Validation
@@ -54,6 +74,7 @@ export async function POST(request) {
     }
 
     if (errors.length > 0) {
+      console.log("Validation errors:", errors);
       return NextResponse.json(
         { message: "Validasi gagal", errors },
         { status: 400 }
@@ -66,6 +87,8 @@ export async function POST(request) {
     // Normalize phone number
     const normalizedPhone = normalizePhoneNumber(no_wa);
 
+    console.log("Creating submission with tracking code:", trackingCode);
+
     // Create submission
     const submission = await Submission.create({
       tracking_code: trackingCode,
@@ -76,6 +99,8 @@ export async function POST(request) {
       jenis_layanan: jenis_layanan.trim(),
       status: "PENGAJUAN_BARU",
     });
+
+    console.log("Submission created successfully:", submission.id);
 
     return NextResponse.json(
       {
@@ -97,10 +122,61 @@ export async function POST(request) {
     }
 
     return NextResponse.json(
-      { message: "Terjadi kesalahan internal server" },
+      {
+        message: "Terjadi kesalahan internal server",
+        error: error.message,
+      },
       { status: 500 }
     );
   }
+}
+
+// Handle GET - List submissions (if needed)
+export async function GET() {
+  console.log("🔍 GET request received at /api/submissions");
+  return NextResponse.json(
+    {
+      message: "Method GET not allowed. Use POST to create submission.",
+      allowed_methods: ["POST", "OPTIONS"],
+    },
+    { status: 405 }
+  );
+}
+
+// Handle PUT - Not allowed
+export async function PUT() {
+  console.log("🔍 PUT request received at /api/submissions");
+  return NextResponse.json(
+    {
+      message: "Method PUT not allowed. Use POST to create submission.",
+      allowed_methods: ["POST", "OPTIONS"],
+    },
+    { status: 405 }
+  );
+}
+
+// Handle PATCH - Not allowed
+export async function PATCH() {
+  console.log("🔍 PATCH request received at /api/submissions");
+  return NextResponse.json(
+    {
+      message: "Method PATCH not allowed. Use POST to create submission.",
+      allowed_methods: ["POST", "OPTIONS"],
+    },
+    { status: 405 }
+  );
+}
+
+// Handle DELETE - Not allowed
+export async function DELETE() {
+  console.log("🔍 DELETE request received at /api/submissions");
+  return NextResponse.json(
+    {
+      message: "Method DELETE not allowed. Use POST to create submission.",
+      allowed_methods: ["POST", "OPTIONS"],
+    },
+    { status: 405 }
+  );
 }
 
 /**
