@@ -30,9 +30,25 @@ export async function GET(request) {
       ],
     });
 
-    // Simple no-cache headers
+    // Vercel-specific no-cache headers
     const response = NextResponse.json(submissions);
-    response.headers.set("Cache-Control", "no-cache");
+
+    // Standard cache control
+    response.headers.set(
+      "Cache-Control",
+      "no-cache, no-store, must-revalidate, private"
+    );
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+
+    // Vercel-specific headers
+    response.headers.set("Surrogate-Control", "no-store");
+    response.headers.set("CDN-Cache-Control", "no-cache");
+    response.headers.set("Vercel-CDN-Cache-Control", "no-cache");
+
+    // Force fresh response
+    response.headers.set("Last-Modified", new Date().toUTCString());
+    response.headers.set("ETag", `"${Date.now()}"`);
 
     return response;
   } catch (error) {
@@ -43,8 +59,15 @@ export async function GET(request) {
       { status: 500 }
     );
 
-    // Simple no-cache for errors too
-    errorResponse.headers.set("Cache-Control", "no-cache");
+    // Same headers for errors
+    errorResponse.headers.set(
+      "Cache-Control",
+      "no-cache, no-store, must-revalidate, private"
+    );
+    errorResponse.headers.set("Pragma", "no-cache");
+    errorResponse.headers.set("Expires", "0");
+    errorResponse.headers.set("Surrogate-Control", "no-store");
+    errorResponse.headers.set("CDN-Cache-Control", "no-cache");
 
     return errorResponse;
   }
