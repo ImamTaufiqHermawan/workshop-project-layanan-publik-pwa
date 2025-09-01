@@ -22,8 +22,6 @@ export default function AdminDashboard() {
   const [chartData, setChartData] = useState([]);
   const [updatingStatus, setUpdatingStatus] = useState({}); // Track which submission is being updated
   const [refreshing, setRefreshing] = useState(false); // Track refresh loading state
-  const [lastFetchTime, setLastFetchTime] = useState(null); // Track last fetch time
-  const [fetchCount, setFetchCount] = useState(0); // Track fetch count
 
   const COLORS = ["#ffc107", "#1890ff", "#52c41a", "#ff4d4f"];
 
@@ -66,10 +64,6 @@ export default function AdminDashboard() {
       );
       const data = await response.json();
 
-      // Update debug info
-      setLastFetchTime(new Date().toISOString());
-      setFetchCount((prev) => prev + 1);
-
       if (response.ok) {
         setSubmissions(data);
         updateChartData(data);
@@ -92,11 +86,6 @@ export default function AdminDashboard() {
   // Simple refresh function
   const handleRefresh = () => {
     fetchSubmissions(true);
-  };
-
-  // Simple force reload
-  const handleForceReload = () => {
-    window.location.reload();
   };
 
   const updateChartData = (data) => {
@@ -133,10 +122,6 @@ export default function AdminDashboard() {
     // Set loading state for this specific submission
     setUpdatingStatus((prev) => ({ ...prev, [submissionId]: true }));
 
-    console.log(
-      `🔄 Updating status for submission ${submissionId} to ${newStatus}`
-    );
-
     try {
       const response = await fetch(
         `/api/admin/submissions/${submissionId}/status`,
@@ -153,37 +138,10 @@ export default function AdminDashboard() {
 
       if (response.ok) {
         message.success("Status berhasil diupdate");
-        // Force refresh dengan cache bypass yang lebih agresif
+        // Simple refresh setelah status update
         setTimeout(() => {
-          // Force refresh dengan multiple parameters
-          const timestamp = Date.now();
-          const random = Math.random().toString(36).substring(7);
-          const forceRefresh = async () => {
-            try {
-              const refreshResponse = await fetch(
-                `/api/admin/submissions?t=${timestamp}&r=${random}&force=1&refresh=${Date.now()}`,
-                {
-                  headers: {
-                    "Cache-Control": "no-cache, no-store, must-revalidate",
-                    Pragma: "no-cache",
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-Force-Refresh": "true",
-                  },
-                }
-              );
-              const refreshData = await refreshResponse.json();
-              setSubmissions(refreshData);
-              updateChartData(refreshData);
-              setLastFetchTime(new Date().toISOString());
-              setFetchCount((prev) => prev + 1);
-            } catch (error) {
-              console.error("Force refresh error:", error);
-              // Fallback ke method biasa
-              fetchSubmissions(true);
-            }
-          };
-          forceRefresh();
-        }, 1000); // Delay 1 detik untuk memastikan database update
+          fetchSubmissions(true);
+        }, 500); // Delay 500ms untuk memastikan database update
       } else {
         const error = await response.json();
         message.error(error.message || "Gagal mengupdate status");
@@ -320,30 +278,23 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
                 Admin Dashboard
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
                 {loading
                   ? "Memuat data pengajuan..."
                   : "Kelola pengajuan layanan masyarakat"}
               </p>
-              {lastFetchTime && (
-                <div className="text-xs text-gray-500 mt-1">
-                  📊 Last fetch:{" "}
-                  {new Date(lastFetchTime).toLocaleString("id-ID")}| 🔄 Count:{" "}
-                  {fetchCount}
-                </div>
-              )}
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={handleRefresh}
                 disabled={refreshing || loading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center"
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center text-sm sm:text-base"
               >
                 {refreshing ? (
                   <>
@@ -397,30 +348,10 @@ export default function AdminDashboard() {
                   "Refresh"
                 )}
               </button>
-              <button
-                onClick={handleForceReload}
-                disabled={refreshing || loading}
-                className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white px-4 py-2 rounded-lg flex items-center"
-                title="Force refresh halaman"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                Force Refresh
-              </button>
+
               <button
                 onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base"
               >
                 Logout
               </button>
@@ -429,16 +360,16 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
         {/* Stats Cards */}
-        <Row gutter={16} className="mb-8">
-          <Col span={6}>
+        <Row gutter={[8, 8]} className="mb-6 sm:mb-8">
+          <Col xs={12} sm={6}>
             <Card>
               <div className="text-center">
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <svg
-                      className="animate-spin h-6 w-6 text-blue-600"
+                      className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-blue-600"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -459,21 +390,23 @@ export default function AdminDashboard() {
                     </svg>
                   </div>
                 ) : (
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-lg sm:text-2xl font-bold text-blue-600">
                     {submissions.length}
                   </div>
                 )}
-                <div className="text-gray-600">Total Pengajuan</div>
+                <div className="text-sm sm:text-base text-gray-600">
+                  Total Pengajuan
+                </div>
               </div>
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6}>
             <Card>
               <div className="text-center">
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <svg
-                      className="animate-spin h-6 w-6 text-yellow-600"
+                      className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-yellow-600"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -494,24 +427,26 @@ export default function AdminDashboard() {
                     </svg>
                   </div>
                 ) : (
-                  <div className="text-2xl font-bold text-yellow-600">
+                  <div className="text-lg sm:text-2xl font-bold text-yellow-600">
                     {
                       submissions.filter((s) => s.status === "PENGAJUAN_BARU")
                         .length
                     }
                   </div>
                 )}
-                <div className="text-gray-600">Pengajuan Baru</div>
+                <div className="text-sm sm:text-base text-gray-600">
+                  Pengajuan Baru
+                </div>
               </div>
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6}>
             <Card>
               <div className="text-center">
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <svg
-                      className="animate-spin h-6 w-6 text-blue-600"
+                      className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-blue-600"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -532,21 +467,23 @@ export default function AdminDashboard() {
                     </svg>
                   </div>
                 ) : (
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-lg sm:text-2xl font-bold text-blue-600">
                     {submissions.filter((s) => s.status === "DIPROSES").length}
                   </div>
                 )}
-                <div className="text-gray-600">Sedang Diproses</div>
+                <div className="text-sm sm:text-base text-gray-600">
+                  Sedang Diproses
+                </div>
               </div>
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6}>
             <Card>
               <div className="text-center">
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <svg
-                      className="animate-spin h-6 w-6 text-green-600"
+                      className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-green-600"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -567,23 +504,25 @@ export default function AdminDashboard() {
                     </svg>
                   </div>
                 ) : (
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-lg sm:text-2xl font-bold text-green-600">
                     {submissions.filter((s) => s.status === "SELESAI").length}
                   </div>
                 )}
-                <div className="text-gray-600">Selesai</div>
+                <div className="text-sm sm:text-base text-gray-600">
+                  Selesai
+                </div>
               </div>
             </Card>
           </Col>
         </Row>
 
         {/* Chart */}
-        <Card title="Distribusi Status Pengajuan" className="mb-8">
+        <Card title="Distribusi Status Pengajuan" className="mb-6 sm:mb-8">
           {loading ? (
             <div className="flex items-center justify-center h-[300px]">
               <div className="text-center">
                 <svg
-                  className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4"
+                  className="animate-spin h-8 w-8 sm:h-12 sm:w-12 text-blue-600 mx-auto mb-4"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -609,7 +548,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-center h-[300px]">
               <div className="text-center text-gray-500">
                 <svg
-                  className="h-16 w-16 mx-auto mb-4 text-gray-300"
+                  className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-gray-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -621,8 +560,10 @@ export default function AdminDashboard() {
                     d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                   />
                 </svg>
-                <p className="text-lg font-medium">Belum ada data</p>
-                <p className="text-sm">
+                <p className="text-base sm:text-lg font-medium">
+                  Belum ada data
+                </p>
+                <p className="text-xs sm:text-sm">
                   Data chart akan muncul setelah ada pengajuan
                 </p>
               </div>
@@ -662,7 +603,7 @@ export default function AdminDashboard() {
             <Select
               value={statusFilter}
               onChange={setStatusFilter}
-              style={{ width: 200 }}
+              style={{ width: "100%", maxWidth: 200 }}
               placeholder="Filter by status"
               disabled={loading || Object.values(updatingStatus).some(Boolean)}
               loading={loading}
@@ -674,7 +615,9 @@ export default function AdminDashboard() {
               <Option value="DITOLAK">Ditolak</Option>
             </Select>
             {loading && (
-              <span className="ml-2 text-sm text-gray-500">Memuat data...</span>
+              <span className="ml-2 text-xs sm:text-sm text-gray-500">
+                Memuat data...
+              </span>
             )}
           </div>
 
@@ -684,13 +627,14 @@ export default function AdminDashboard() {
               dataSource={filteredSubmissions}
               rowKey="id"
               loading={loading}
-              scroll={{ x: 1200, y: 400 }}
+              scroll={{ x: 800, y: 400 }}
               pagination={{
                 pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: true,
+                showSizeChanger: false,
+                showQuickJumper: false,
                 showTotal: (total, range) =>
                   `${range[0]}-${range[1]} dari ${total} pengajuan`,
+                size: "small",
               }}
               size="small"
               className="responsive-table"
@@ -720,7 +664,7 @@ export default function AdminDashboard() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <p className="text-blue-600 font-medium">
+                  <p className="text-blue-600 font-medium text-sm sm:text-base">
                     Memperbarui status...
                   </p>
                 </div>
@@ -754,12 +698,16 @@ export default function AdminDashboard() {
 
         @media (max-width: 768px) {
           .responsive-table .ant-table {
-            font-size: 12px;
+            font-size: 11px;
           }
 
           .responsive-table .ant-table-thead > tr > th,
           .responsive-table .ant-table-tbody > tr > td {
-            padding: 6px 8px;
+            padding: 4px 6px;
+          }
+
+          .responsive-table .ant-table-pagination {
+            font-size: 11px;
           }
         }
       `}</style>
