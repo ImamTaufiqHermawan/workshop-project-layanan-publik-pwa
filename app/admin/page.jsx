@@ -22,6 +22,8 @@ export default function AdminDashboard() {
   const [chartData, setChartData] = useState([]);
   const [updatingStatus, setUpdatingStatus] = useState({}); // Track which submission is being updated
   const [refreshing, setRefreshing] = useState(false); // Track refresh loading state
+  const [lastFetchTime, setLastFetchTime] = useState(null); // Track last fetch time
+  const [fetchCount, setFetchCount] = useState(0); // Track fetch count
 
   const COLORS = ["#ffc107", "#1890ff", "#52c41a", "#ff4d4f"];
 
@@ -49,9 +51,24 @@ export default function AdminDashboard() {
     }
 
     try {
-      // Simple fetch without complex cache busting
-      const response = await fetch("/api/admin/submissions");
+      // Force cache bypass dengan timestamp dan random parameter
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(7);
+      const response = await fetch(
+        `/api/admin/submissions?t=${timestamp}&r=${random}`,
+        {
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        }
+      );
       const data = await response.json();
+
+      // Update debug info
+      setLastFetchTime(new Date().toISOString());
+      setFetchCount((prev) => prev + 1);
 
       if (response.ok) {
         setSubmissions(data);
@@ -278,6 +295,13 @@ export default function AdminDashboard() {
                   ? "Memuat data pengajuan..."
                   : "Kelola pengajuan layanan masyarakat"}
               </p>
+              {lastFetchTime && (
+                <div className="text-xs text-gray-500 mt-1">
+                  📊 Last fetch:{" "}
+                  {new Date(lastFetchTime).toLocaleString("id-ID")}| 🔄 Count:{" "}
+                  {fetchCount}
+                </div>
+              )}
             </div>
             <div className="flex items-center space-x-4">
               <button
