@@ -153,10 +153,37 @@ export default function AdminDashboard() {
 
       if (response.ok) {
         message.success("Status berhasil diupdate");
-        // Force refresh dengan cache bypass
+        // Force refresh dengan cache bypass yang lebih agresif
         setTimeout(() => {
-          fetchSubmissions(true); // Refresh dengan loading
-        }, 500); // Delay 500ms untuk memastikan database update
+          // Force refresh dengan multiple parameters
+          const timestamp = Date.now();
+          const random = Math.random().toString(36).substring(7);
+          const forceRefresh = async () => {
+            try {
+              const refreshResponse = await fetch(
+                `/api/admin/submissions?t=${timestamp}&r=${random}&force=1&refresh=${Date.now()}`,
+                {
+                  headers: {
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    Pragma: "no-cache",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-Force-Refresh": "true",
+                  },
+                }
+              );
+              const refreshData = await refreshResponse.json();
+              setSubmissions(refreshData);
+              updateChartData(refreshData);
+              setLastFetchTime(new Date().toISOString());
+              setFetchCount((prev) => prev + 1);
+            } catch (error) {
+              console.error("Force refresh error:", error);
+              // Fallback ke method biasa
+              fetchSubmissions(true);
+            }
+          };
+          forceRefresh();
+        }, 1000); // Delay 1 detik untuk memastikan database update
       } else {
         const error = await response.json();
         message.error(error.message || "Gagal mengupdate status");
