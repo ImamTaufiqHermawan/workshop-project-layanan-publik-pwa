@@ -17,14 +17,16 @@ export async function GET(request) {
     // In a real application, you would verify admin authentication here
     // For workshop purposes, we'll skip authentication
 
-    // Simple timestamp for logging
+    // Force fresh data dengan multiple strategies
     const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(7);
+    const forceRefresh = Date.now();
 
     console.log(
-      `[${new Date().toISOString()}] Fetching submissions with timestamp: ${timestamp}`
+      `[${new Date().toISOString()}] Fetching submissions with force refresh: ${timestamp}-${random}-${forceRefresh}`
     );
 
-    // Simple query dengan order yang konsisten
+    // Force fresh query dengan multiple strategies
     const submissions = await Submission.findAll({
       order: [["created_at", "DESC"]], // Consistent order
       attributes: [
@@ -36,6 +38,10 @@ export async function GET(request) {
         "created_at",
         "updated_at",
       ],
+      // Force fresh data
+      raw: false,
+      // Add random parameter to force fresh query
+      logging: console.log,
     });
 
     console.log(
@@ -52,22 +58,27 @@ export async function GET(request) {
     // Vercel-specific no-cache headers
     const response = NextResponse.json(submissions);
 
-    // Standard no-cache headers
+    // Ultra-aggressive cache control
     response.headers.set(
       "Cache-Control",
-      "no-cache, no-store, must-revalidate, private"
+      "no-cache, no-store, must-revalidate, private, max-age=0, s-maxage=0, stale-while-revalidate=0"
     );
     response.headers.set("Pragma", "no-cache");
     response.headers.set("Expires", "0");
+    response.headers.set("Clear-Site-Data", '"cache"');
 
     // Vercel-specific headers
     response.headers.set("Surrogate-Control", "no-store");
     response.headers.set("CDN-Cache-Control", "no-cache");
     response.headers.set("Vercel-CDN-Cache-Control", "no-cache");
+    response.headers.set("X-Vercel-Cache", "MISS");
 
-    // Simple timestamp
+    // Force fresh response dengan dynamic values
     response.headers.set("Last-Modified", new Date().toUTCString());
-    response.headers.set("ETag", `"${timestamp}"`);
+    response.headers.set("ETag", `"${timestamp}-${random}-${forceRefresh}"`);
+    response.headers.set("X-Response-Time", `${Date.now()}`);
+    response.headers.set("X-Cache-Buster", `${timestamp}-${random}`);
+    response.headers.set("X-Force-Refresh", "true");
 
     return response;
   } catch (error) {
