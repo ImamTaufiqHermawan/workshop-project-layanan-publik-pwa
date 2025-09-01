@@ -55,12 +55,69 @@ export default function Home() {
             </svg>
             Layanan Masyarakat
           </Link>
+
+          {/* PWA Install Button */}
+          <button
+            id="pwa-install-btn"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center hidden"
+            onClick={() => {
+              if (window.deferredPrompt) {
+                window.deferredPrompt.prompt();
+                window.deferredPrompt.userChoice.then((choiceResult) => {
+                  if (choiceResult.outcome === "accepted") {
+                    console.log("User accepted the install prompt");
+                  } else {
+                    console.log("User dismissed the install prompt");
+                  }
+                  window.deferredPrompt = null;
+                  document
+                    .getElementById("pwa-install-btn")
+                    .classList.add("hidden");
+                });
+              }
+            }}
+          >
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+              />
+            </svg>
+            Install Aplikasi
+          </button>
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>© 2024 Layanan Publik PWA</p>
           <p className="mt-1">Workshop-Friendly System</p>
         </div>
+
+        {/* PWA Install Script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Show PWA install button when available
+              window.showInstallPrompt = function() {
+                const installBtn = document.getElementById('pwa-install-btn');
+                if (installBtn) {
+                  installBtn.classList.remove('hidden');
+                }
+              };
+              
+              // Check if PWA is already installed
+              if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('PWA is already installed');
+              }
+            `,
+          }}
+        />
       </div>
     </div>
   );
