@@ -49,7 +49,15 @@ export default function AdminDashboard() {
     }
 
     try {
-      const response = await fetch("/api/admin/submissions");
+      // Add cache busting parameter to ensure fresh data
+      const timestamp = Date.now();
+      const response = await fetch(`/api/admin/submissions?t=${timestamp}`, {
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      });
       const data = await response.json();
 
       if (response.ok) {
@@ -69,6 +77,52 @@ export default function AdminDashboard() {
         setRefreshing(false);
       }
     }
+  };
+
+  // Function to clear service worker cache
+  const clearServiceWorkerCache = async () => {
+    if ("serviceWorker" in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration && registration.active) {
+          // Send message to service worker to clear cache
+          registration.active.postMessage({ type: "CLEAR_CACHE" });
+
+          // Force update service worker
+          await registration.update();
+
+          message.success("Cache berhasil dibersihkan");
+
+          // Refresh data after cache clear
+          setTimeout(() => {
+            fetchSubmissions(true);
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("Error clearing service worker cache:", error);
+        message.error("Gagal membersihkan cache");
+      }
+    }
+  };
+
+  // Function to force refresh without cache
+  const forceRefresh = async () => {
+    setRefreshing(true);
+
+    // Clear browser cache for this page
+    if ("caches" in window) {
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map((cacheName) => caches.delete(cacheName))
+        );
+      } catch (error) {
+        console.error("Error clearing browser cache:", error);
+      }
+    }
+
+    // Force reload the page
+    window.location.reload();
   };
 
   const updateChartData = (data) => {
@@ -325,6 +379,48 @@ export default function AdminDashboard() {
                 ) : (
                   "Refresh"
                 )}
+              </button>
+              <button
+                onClick={clearServiceWorkerCache}
+                disabled={refreshing || loading}
+                className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-yellow-400 text-white px-4 py-2 rounded-lg flex items-center"
+                title="Bersihkan cache service worker"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                Clear Cache
+              </button>
+              <button
+                onClick={forceRefresh}
+                disabled={refreshing || loading}
+                className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white px-4 py-2 rounded-lg flex items-center"
+                title="Force refresh halaman"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Force Refresh
               </button>
               <button
                 onClick={handleLogout}
