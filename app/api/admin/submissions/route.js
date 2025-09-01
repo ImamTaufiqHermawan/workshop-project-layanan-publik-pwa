@@ -30,15 +30,9 @@ export async function GET(request) {
       ],
     });
 
-    // Add strict cache control headers to prevent caching
+    // Simple no-cache headers
     const response = NextResponse.json(submissions);
-    response.headers.set(
-      "Cache-Control",
-      "no-cache, no-store, must-revalidate, private"
-    );
-    response.headers.set("Pragma", "no-cache");
-    response.headers.set("Expires", "0");
-    response.headers.set("Surrogate-Control", "no-store");
+    response.headers.set("Cache-Control", "no-cache");
 
     return response;
   } catch (error) {
@@ -49,13 +43,8 @@ export async function GET(request) {
       { status: 500 }
     );
 
-    // Add cache control headers to error responses too
-    errorResponse.headers.set(
-      "Cache-Control",
-      "no-cache, no-store, must-revalidate, private"
-    );
-    errorResponse.headers.set("Pragma", "no-cache");
-    errorResponse.headers.set("Expires", "0");
+    // Simple no-cache for errors too
+    errorResponse.headers.set("Cache-Control", "no-cache");
 
     return errorResponse;
   }

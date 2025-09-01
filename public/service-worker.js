@@ -1,27 +1,23 @@
-const CACHE_NAME = "layanan-publik-v3"; // Increment version
-const STATIC_CACHE = "static-v3";
-const DYNAMIC_CACHE = "dynamic-v3";
+// Minimal Service Worker untuk PWA Workshop
+// Hanya handle basic PWA features, tidak ada complex caching
 
-const urlsToCache = [
-  "/",
-  "/public",
-  "/admin",
-  "/manifest.json",
-  "/icon-192.png",
-  "/icon-512.png",
-];
+const CACHE_NAME = "layanan-publik-simple";
 
-// Install event - cache static resources
+// Install event - minimal caching
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
-      console.log("Opened static cache");
-      return cache.addAll(urlsToCache);
-    })
-  );
+  console.log("Service Worker installed - minimal mode");
+  // Skip waiting to activate immediately
+  self.skipWaiting();
 });
 
-// Fetch event - smart caching strategy
+// Activate event - clean up
+self.addEventListener("activate", (event) => {
+  console.log("Service Worker activated - minimal mode");
+  // Claim all clients immediately
+  event.waitUntil(self.clients.claim());
+});
+
+// Fetch event - NO CACHING for API, minimal for others
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -36,112 +32,29 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Special handling for API requests - always fetch fresh data
+  // IMPORTANT: NEVER cache API requests
   if (url.pathname.startsWith("/api/")) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Don't cache API responses to ensure fresh data
-          return response;
-        })
-        .catch(() => {
-          // If network fails, don't serve cached API data
-          return new Response('{"error": "Network error"}', {
-            status: 503,
-            headers: { "Content-Type": "application/json" },
-          });
-        })
-    );
+    // Let the request go through normally, no caching
     return;
   }
 
-  // Handle different types of requests
-  if (request.destination === "document" || request.destination === "") {
-    // For HTML pages, try network first, fallback to cache
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Clone the response before caching
-          const responseClone = response.clone();
-          caches.open(DYNAMIC_CACHE).then((cache) => {
-            cache.put(request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request);
-        })
-    );
-  } else if (
-    request.destination === "style" ||
-    request.destination === "script"
-  ) {
-    // For CSS and JS, try cache first, fallback to network
-    event.respondWith(
-      caches.match(request).then((response) => {
-        return (
-          response ||
-          fetch(request).then((fetchResponse) => {
-            // Cache the new response
-            const responseClone = fetchResponse.clone();
-            caches.open(DYNAMIC_CACHE).then((cache) => {
-              cache.put(request, responseClone);
-            });
-            return fetchResponse;
-          })
-        );
-      })
-    );
-  } else {
-    // For other resources, try network first, fallback to cache
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request);
-        })
-    );
+  // For non-API requests, minimal handling
+  if (request.destination === "document") {
+    // HTML pages - no caching, always fresh
+    return;
   }
-});
 
-// Activate event - clean up old caches
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-              console.log("Deleting old cache:", cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-      .then(() => {
-        // Claim all clients to ensure the new service worker takes control
-        return self.clients.claim();
-      })
-  );
-});
-
-// Background sync for offline functionality
-self.addEventListener("sync", (event) => {
-  if (event.tag === "background-sync") {
-    event.waitUntil(doBackgroundSync());
+  // For static assets, minimal caching
+  if (request.destination === "style" || request.destination === "script") {
+    // Let browser handle caching naturally
+    return;
   }
+
+  // For other resources, no caching
+  return;
 });
 
-function doBackgroundSync() {
-  // Handle background sync tasks
-  console.log("Background sync triggered");
-  return Promise.resolve();
-}
-
-// Push notification handling
+// Push notification handling (keep for PWA features)
 self.addEventListener("push", (event) => {
   const options = {
     body: event.data ? event.data.text() : "Update status pengajuan Anda",
@@ -180,22 +93,9 @@ self.addEventListener("notificationclick", (event) => {
   }
 });
 
-// Message handling for cache invalidation
+// Message handling for simple operations
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
-  }
-
-  if (event.data && event.data.type === "CLEAR_CACHE") {
-    event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            console.log("Clearing cache:", cacheName);
-            return caches.delete(cacheName);
-          })
-        );
-      })
-    );
   }
 });

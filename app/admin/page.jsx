@@ -49,15 +49,8 @@ export default function AdminDashboard() {
     }
 
     try {
-      // Add cache busting parameter to ensure fresh data
-      const timestamp = Date.now();
-      const response = await fetch(`/api/admin/submissions?t=${timestamp}`, {
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      });
+      // Simple fetch without complex cache busting
+      const response = await fetch("/api/admin/submissions");
       const data = await response.json();
 
       if (response.ok) {
@@ -79,49 +72,13 @@ export default function AdminDashboard() {
     }
   };
 
-  // Function to clear service worker cache
-  const clearServiceWorkerCache = async () => {
-    if ("serviceWorker" in navigator) {
-      try {
-        const registration = await navigator.serviceWorker.getRegistration();
-        if (registration && registration.active) {
-          // Send message to service worker to clear cache
-          registration.active.postMessage({ type: "CLEAR_CACHE" });
-
-          // Force update service worker
-          await registration.update();
-
-          message.success("Cache berhasil dibersihkan");
-
-          // Refresh data after cache clear
-          setTimeout(() => {
-            fetchSubmissions(true);
-          }, 1000);
-        }
-      } catch (error) {
-        console.error("Error clearing service worker cache:", error);
-        message.error("Gagal membersihkan cache");
-      }
-    }
+  // Simple refresh function
+  const handleRefresh = () => {
+    fetchSubmissions(true);
   };
 
-  // Function to force refresh without cache
-  const forceRefresh = async () => {
-    setRefreshing(true);
-
-    // Clear browser cache for this page
-    if ("caches" in window) {
-      try {
-        const cacheNames = await caches.keys();
-        await Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName))
-        );
-      } catch (error) {
-        console.error("Error clearing browser cache:", error);
-      }
-    }
-
-    // Force reload the page
+  // Simple force reload
+  const handleForceReload = () => {
     window.location.reload();
   };
 
@@ -324,7 +281,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => fetchSubmissions(true)}
+                onClick={handleRefresh}
                 disabled={refreshing || loading}
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center"
               >
@@ -381,28 +338,7 @@ export default function AdminDashboard() {
                 )}
               </button>
               <button
-                onClick={clearServiceWorkerCache}
-                disabled={refreshing || loading}
-                className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-yellow-400 text-white px-4 py-2 rounded-lg flex items-center"
-                title="Bersihkan cache service worker"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Clear Cache
-              </button>
-              <button
-                onClick={forceRefresh}
+                onClick={handleForceReload}
                 disabled={refreshing || loading}
                 className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white px-4 py-2 rounded-lg flex items-center"
                 title="Force refresh halaman"
