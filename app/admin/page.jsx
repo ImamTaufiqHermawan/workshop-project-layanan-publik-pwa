@@ -47,7 +47,7 @@ export default function AdminDashboard() {
     if (showLoading) {
       setRefreshing(true);
     }
-    
+
     try {
       const response = await fetch("/api/admin/submissions");
       const data = await response.json();
@@ -103,8 +103,8 @@ export default function AdminDashboard() {
 
   const handleStatusChange = async (submissionId, newStatus) => {
     // Set loading state for this specific submission
-    setUpdatingStatus(prev => ({ ...prev, [submissionId]: true }));
-    
+    setUpdatingStatus((prev) => ({ ...prev, [submissionId]: true }));
+
     try {
       const response = await fetch(
         `/api/admin/submissions/${submissionId}/status`,
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       message.error("Terjadi kesalahan jaringan");
     } finally {
       // Clear loading state for this submission
-      setUpdatingStatus(prev => ({ ...prev, [submissionId]: false }));
+      setUpdatingStatus((prev) => ({ ...prev, [submissionId]: false }));
     }
   };
 
@@ -142,22 +142,27 @@ export default function AdminDashboard() {
       title: "Kode Tracking",
       dataIndex: "tracking_code",
       key: "tracking_code",
-      render: (text) => <span className="font-mono">{text}</span>,
+      render: (text) => <span className="font-mono text-sm">{text}</span>,
+      width: 150,
+      fixed: "left",
     },
     {
       title: "Nama",
       dataIndex: "nama",
       key: "nama",
+      width: 120,
     },
     {
       title: "Jenis Layanan",
       dataIndex: "jenis_layanan",
       key: "jenis_layanan",
+      width: 120,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      width: 180,
       render: (status, record) => (
         <div className="flex items-center space-x-2">
           <Select
@@ -174,9 +179,25 @@ export default function AdminDashboard() {
           </Select>
           {updatingStatus[record.id] && (
             <div className="flex items-center text-blue-600 text-sm">
-              <svg className="animate-spin h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin h-4 w-4 mr-1"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               Updating...
             </div>
@@ -185,10 +206,44 @@ export default function AdminDashboard() {
       ),
     },
     {
-      title: "Tanggal",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date) => new Date(date).toLocaleDateString("id-ID"),
+      title: "Dibuat",
+      dataIndex: "created_at",
+      key: "created_at",
+      width: 150,
+      render: (date) => {
+        if (!date) return "-";
+        try {
+          return new Date(date).toLocaleString("id-ID", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } catch (error) {
+          return "-";
+        }
+      },
+    },
+    {
+      title: "Diupdate",
+      dataIndex: "updated_at",
+      key: "updated_at",
+      width: 150,
+      render: (date) => {
+        if (!date) return "-";
+        try {
+          return new Date(date).toLocaleString("id-ID", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } catch (error) {
+          return "-";
+        }
+      },
     },
   ];
 
@@ -208,7 +263,9 @@ export default function AdminDashboard() {
                 Admin Dashboard
               </h1>
               <p className="text-gray-600 mt-1">
-                {loading ? "Memuat data pengajuan..." : "Kelola pengajuan layanan masyarakat"}
+                {loading
+                  ? "Memuat data pengajuan..."
+                  : "Kelola pengajuan layanan masyarakat"}
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -219,17 +276,49 @@ export default function AdminDashboard() {
               >
                 {refreshing ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Refreshing...
                   </>
                 ) : loading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Loading...
                   </>
@@ -256,9 +345,25 @@ export default function AdminDashboard() {
               <div className="text-center">
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <svg className="animate-spin h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-6 w-6 text-blue-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                   </div>
                 ) : (
@@ -275,9 +380,25 @@ export default function AdminDashboard() {
               <div className="text-center">
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <svg className="animate-spin h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-6 w-6 text-yellow-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                   </div>
                 ) : (
@@ -297,9 +418,25 @@ export default function AdminDashboard() {
               <div className="text-center">
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <svg className="animate-spin h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-6 w-6 text-blue-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                   </div>
                 ) : (
@@ -316,9 +453,25 @@ export default function AdminDashboard() {
               <div className="text-center">
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <svg className="animate-spin h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-6 w-6 text-green-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                   </div>
                 ) : (
@@ -337,9 +490,25 @@ export default function AdminDashboard() {
           {loading ? (
             <div className="flex items-center justify-center h-[300px]">
               <div className="text-center">
-                <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 <p className="text-gray-600">Memuat data chart...</p>
               </div>
@@ -347,11 +516,23 @@ export default function AdminDashboard() {
           ) : chartData.length === 0 ? (
             <div className="flex items-center justify-center h-[300px]">
               <div className="text-center text-gray-500">
-                <svg className="h-16 w-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                <svg
+                  className="h-16 w-16 mx-auto mb-4 text-gray-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
                 </svg>
                 <p className="text-lg font-medium">Belum ada data</p>
-                <p className="text-sm">Data chart akan muncul setelah ada pengajuan</p>
+                <p className="text-sm">
+                  Data chart akan muncul setelah ada pengajuan
+                </p>
               </div>
             </div>
           ) : (
@@ -411,6 +592,7 @@ export default function AdminDashboard() {
               dataSource={filteredSubmissions}
               rowKey="id"
               loading={loading}
+              scroll={{ x: 1200, y: 400 }}
               pagination={{
                 pageSize: 10,
                 showSizeChanger: true,
@@ -418,23 +600,77 @@ export default function AdminDashboard() {
                 showTotal: (total, range) =>
                   `${range[0]}-${range[1]} dari ${total} pengajuan`,
               }}
+              size="small"
+              className="responsive-table"
             />
-            
+
             {/* Loading overlay when any status is being updated */}
             {Object.values(updatingStatus).some(Boolean) && (
               <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
                 <div className="text-center">
-                  <svg className="animate-spin h-8 w-8 text-blue-600 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin h-8 w-8 text-blue-600 mx-auto mb-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
-                  <p className="text-blue-600 font-medium">Memperbarui status...</p>
+                  <p className="text-blue-600 font-medium">
+                    Memperbarui status...
+                  </p>
                 </div>
               </div>
             )}
           </div>
         </Card>
       </div>
+
+      {/* Custom CSS for responsive table */}
+      <style jsx global>{`
+        .responsive-table .ant-table {
+          overflow-x: auto;
+        }
+
+        .responsive-table .ant-table-thead > tr > th,
+        .responsive-table .ant-table-tbody > tr > td {
+          white-space: nowrap;
+          padding: 8px 12px;
+        }
+
+        .responsive-table .ant-table-thead > tr > th {
+          background-color: #fafafa;
+          font-weight: 600;
+          color: #262626;
+        }
+
+        .responsive-table .ant-table-tbody > tr:hover > td {
+          background-color: #f5f5f5;
+        }
+
+        @media (max-width: 768px) {
+          .responsive-table .ant-table {
+            font-size: 12px;
+          }
+
+          .responsive-table .ant-table-thead > tr > th,
+          .responsive-table .ant-table-tbody > tr > td {
+            padding: 6px 8px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
