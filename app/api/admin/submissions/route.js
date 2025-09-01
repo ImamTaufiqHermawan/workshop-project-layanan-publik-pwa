@@ -18,14 +18,15 @@ export async function GET(request) {
     // For workshop purposes, we'll skip authentication
 
     const submissions = await Submission.findAll({
-      order: [["id", "DESC"]], // Use id instead of createdAt
+      order: [["created_at", "DESC"]], // Use database column name
       attributes: [
         "id",
         "tracking_code",
         "nama",
         "jenis_layanan",
         "status",
-        // createdAt and updatedAt removed since timestamps are disabled
+        "created_at",
+        "updated_at",
       ],
     });
 
