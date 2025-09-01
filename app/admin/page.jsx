@@ -133,6 +133,10 @@ export default function AdminDashboard() {
     // Set loading state for this specific submission
     setUpdatingStatus((prev) => ({ ...prev, [submissionId]: true }));
 
+    console.log(
+      `🔄 Updating status for submission ${submissionId} to ${newStatus}`
+    );
+
     try {
       const response = await fetch(
         `/api/admin/submissions/${submissionId}/status`,
@@ -140,6 +144,8 @@ export default function AdminDashboard() {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+            "X-Requested-With": "XMLHttpRequest",
           },
           body: JSON.stringify({ status: newStatus }),
         }
@@ -147,7 +153,10 @@ export default function AdminDashboard() {
 
       if (response.ok) {
         message.success("Status berhasil diupdate");
-        fetchSubmissions(); // Refresh data
+        // Force refresh dengan cache bypass
+        setTimeout(() => {
+          fetchSubmissions(true); // Refresh dengan loading
+        }, 500); // Delay 500ms untuk memastikan database update
       } else {
         const error = await response.json();
         message.error(error.message || "Gagal mengupdate status");

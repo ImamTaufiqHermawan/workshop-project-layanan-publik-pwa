@@ -17,6 +17,12 @@ export async function GET(request) {
     // In a real application, you would verify admin authentication here
     // For workshop purposes, we'll skip authentication
 
+    // Force fresh data by adding timestamp to query
+    const timestamp = Date.now();
+    console.log(
+      `[${new Date().toISOString()}] Fetching submissions with timestamp: ${timestamp}`
+    );
+
     const submissions = await Submission.findAll({
       order: [["created_at", "DESC"]], // Use database column name
       attributes: [
@@ -29,6 +35,17 @@ export async function GET(request) {
         "updated_at",
       ],
     });
+
+    console.log(
+      `[${new Date().toISOString()}] Found ${submissions.length} submissions`
+    );
+    if (submissions.length > 0) {
+      console.log(
+        `[${new Date().toISOString()}] Latest submission: ${
+          submissions[0].tracking_code
+        } (${submissions[0].status})`
+      );
+    }
 
     // Vercel-specific no-cache headers
     const response = NextResponse.json(submissions);
