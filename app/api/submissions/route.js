@@ -135,9 +135,9 @@ export async function POST(request) {
     const body = await request.json();
 
     // Validate required fields
-    const { nama, jenis_layanan, deskripsi, email, phone } = body;
+    const { nama, nik, email, no_wa, jenis_layanan, consent } = body;
 
-    if (!nama || !jenis_layanan || !deskripsi || !email || !phone) {
+    if (!nama || !nik || !email || !no_wa || !jenis_layanan || !consent) {
       return NextResponse.json(
         { message: "Semua field harus diisi" },
         { status: 400 }
@@ -153,10 +153,11 @@ export async function POST(request) {
     const submission = await Submission.create({
       tracking_code,
       nama,
+      nik,
       jenis_layanan,
-      deskripsi,
       email,
-      phone,
+      no_wa,
+      consent,
       status: "pending",
     });
 
