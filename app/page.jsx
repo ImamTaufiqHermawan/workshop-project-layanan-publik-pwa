@@ -1,8 +1,78 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Home() {
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  useEffect(() => {
+    // Check if PWA is already installed
+    const checkIfInstalled = () => {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+        setShowInstallPrompt(false);
+        return true;
+      }
+      
+      // Check if running in installed PWA
+      if (window.navigator.standalone === true) {
+        setShowInstallPrompt(false);
+        return true;
+      }
+      
+      return false;
+    };
+
+    // Listen for beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e) => {
+      console.log('PWA install prompt ready');
+      e.preventDefault();
+      setDeferredPrompt(e);
+      
+      // Only show if not already installed
+      if (!checkIfInstalled()) {
+        setShowInstallPrompt(true);
+      }
+    };
+
+    // Listen for appinstalled event
+    const handleAppInstalled = () => {
+      console.log('PWA was installed');
+      setDeferredPrompt(null);
+      setShowInstallPrompt(false);
+    };
+
+    // Check initial state
+    checkIfInstalled();
+
+    // Add event listeners
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        setShowInstallPrompt(false);
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      
+      setDeferredPrompt(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
@@ -56,68 +126,58 @@ export default function Home() {
             Layanan Masyarakat
           </Link>
 
-          {/* PWA Install Button */}
-          <button
-            id="pwa-install-btn"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center hidden"
-            onClick={() => {
-              if (window.deferredPrompt) {
-                window.deferredPrompt.prompt();
-                window.deferredPrompt.userChoice.then((choiceResult) => {
-                  if (choiceResult.outcome === "accepted") {
-                    console.log("User accepted the install prompt");
-                  } else {
-                    console.log("User dismissed the install prompt");
-                  }
-                  window.deferredPrompt = null;
-                  document
-                    .getElementById("pwa-install-btn")
-                    .classList.add("hidden");
-                });
-              }
-            }}
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-              />
-            </svg>
-            Install Aplikasi
-          </button>
+          {/* PWA Install Button - Codashop Style */}
+          {showInstallPrompt && (
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <div className="flex items-start space-x-3">
+                <div className="bg-purple-600 rounded-lg p-2 flex-shrink-0">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 leading-tight">
+                    Tambahkan Layanan Publik PWA ke home screen Anda dengan akses 1-klik
+                  </p>
+                  <button
+                    onClick={handleInstallClick}
+                    className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center group"
+                  >
+                    Tambahkan sekarang
+                    <svg
+                      className="w-4 h-4 ml-1 transform group-hover:-translate-x-1 transition-transform"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>© 2024 Layanan Publik PWA</p>
           <p className="mt-1">Workshop-Friendly System</p>
         </div>
-
-        {/* PWA Install Script */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Show PWA install button when available
-              window.showInstallPrompt = function() {
-                const installBtn = document.getElementById('pwa-install-btn');
-                if (installBtn) {
-                  installBtn.classList.remove('hidden');
-                }
-              };
-              
-              // Check if PWA is already installed
-              if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('PWA is already installed');
-              }
-            `,
-          }}
-        />
       </div>
     </div>
   );

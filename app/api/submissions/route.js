@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Submission, initializeDatabase } from "@/lib/sequelize";
+import { ensurePlus62Format, isValidIndonesianMobile } from "@/lib/phone";
 
 // Initialize database on first request
 let dbInitialized = false;
@@ -144,25 +145,35 @@ export async function POST(request) {
       );
     }
 
+    // Normalize and validate phone number
+    const normalizedPhone = ensurePlus62Format(no_wa);
+    
+    if (!normalizedPhone || !isValidIndonesianMobile(normalizedPhone)) {
+      return NextResponse.json(
+        { message: "Format nomor telepon tidak valid. Gunakan format +62 atau 08xxx" },
+        { status: 400 }
+      );
+    }
+
     // Generate tracking code
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
     const tracking_code = `WS-${timestamp}-${random}`;
 
-    // Create submission
+    // Create submission with normalized phone number
     const submission = await Submission.create({
       tracking_code,
       nama,
       nik,
       jenis_layanan,
       email,
-      no_wa,
+      no_wa: normalizedPhone, // Store normalized phone number
       consent,
       status: "PENGAJUAN_BARU",
     });
 
     console.log(
-      `[${new Date().toISOString()}] Created submission: ${tracking_code}`
+      `[${new Date().toISOString()}] Created submission: ${tracking_code} with phone: ${normalizedPhone}`
     );
 
     return NextResponse.json(

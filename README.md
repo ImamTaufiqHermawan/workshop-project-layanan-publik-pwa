@@ -12,6 +12,96 @@ Sistem Layanan Publik Berbasis Progressive Web App (PWA) dengan fitur pengajuan 
 - **Responsive Design** - Mobile-first dengan TailwindCSS
 - **Database** - PostgreSQL dengan Sequelize ORM
 
+## 📱 PWA Features
+
+### PWA Installation Button
+
+- **Button Install PWA** yang muncul otomatis saat user belum install PWA
+- **Auto-hide** setelah PWA berhasil diinstall
+- **Re-appear** jika user uninstall PWA
+- **Design Codashop-style** dengan card putih dan icon ungu
+
+### Cara Kerja PWA
+1. **Detection**: Menggunakan `beforeinstallprompt` event untuk mendeteksi kapan PWA bisa diinstall
+2. **State Management**: Menggunakan React state untuk mengontrol visibility button
+3. **Installation**: Menangani proses install dan update state sesuai hasil
+4. **Auto-hide**: Button otomatis hilang setelah install berhasil
+
+### PWA Components
+- **`PWAInstallButton.jsx`** - Komponen reusable untuk PWA install
+- **Service Worker**: Offline functionality and caching
+- **Manifest**: App-like experience with icons
+- **Icons**: 192x192 and 512x512 for mobile devices
+
+### Event Handling PWA
+- `beforeinstallprompt`: Menyimpan prompt dan show button
+- `appinstalled`: Hide button setelah install berhasil
+- `display-mode: standalone`: Check apakah PWA sudah running
+
+### Install PWA
+1. Buka aplikasi di Chrome/Edge mobile
+2. Tap menu (⋮) → "Add to Home Screen"
+3. PWA akan terinstall seperti aplikasi native
+
+### Offline Support
+- Service worker menyimpan cache untuk offline access
+- Form pengajuan dapat diisi offline
+- Data akan sync saat online kembali
+
+## 📞 Format Nomor Telepon +62
+
+### Fitur Utama
+- **Auto-convert** semua format ke +62xxx
+- **Frontend validation** dengan input field yang user-friendly
+- **Backend normalization** untuk memastikan konsistensi database
+- **Support multiple formats**: +62, 08xxx, 8xxx, dll
+
+### Format yang Didukung
+- `+62812345678` → `+62812345678` (sudah benar)
+- `0812345678` → `+62812345678` (auto-convert)
+- `812345678` → `+62812345678` (auto-convert)
+- `62812345678` → `+62812345678` (auto-convert)
+
+### Implementasi
+
+#### Frontend (PhoneInput Component)
+```jsx
+<PhoneInput
+  value={formData.no_wa}
+  onChange={(value) => setFormData(prev => ({ ...prev, no_wa: value }))}
+  required
+  label="Nomor WhatsApp"
+/>
+```
+
+#### Backend (API Route)
+```javascript
+import { ensurePlus62Format, isValidIndonesianMobile } from "@/lib/phone";
+
+// Normalize and validate phone number
+const normalizedPhone = ensurePlus62Format(no_wa);
+
+if (!normalizedPhone || !isValidIndonesianMobile(normalizedPhone)) {
+  return NextResponse.json(
+    { message: "Format nomor telepon tidak valid. Gunakan format +62 atau 08xxx" },
+    { status: 400 }
+  );
+}
+```
+
+#### Utility Functions (lib/phone.js)
+- `normalizePhoneNumber()`: Convert semua format ke +62
+- `ensurePlus62Format()`: Double-check dan force +62 format
+- `isValidIndonesianMobile()`: Validasi format nomor Indonesia
+- `formatPhoneForDisplay()`: Format untuk tampilan
+- `formatPhoneForInput()`: Format untuk input field
+
+### Keamanan
+- **Input sanitization**: Remove semua karakter non-digit
+- **Length validation**: Maksimal 15 digit (termasuk +62)
+- **Format enforcement**: Selalu mulai dengan +62
+- **Backend validation**: Double-check di API level
+
 ## 📋 Prerequisites
 
 Sebelum memulai, pastikan Anda telah menginstall:
@@ -103,6 +193,21 @@ npm run dev
 Buka [http://localhost:3000](http://localhost:3000) di browser.
 
 ## 🧪 Testing
+
+### Test PWA Installation
+1. Buka website di Chrome/Edge mobile
+2. Button install akan muncul otomatis
+3. Click "Tambahkan sekarang"
+4. Confirm installation
+5. Button akan hilang
+6. Uninstall dari home screen
+7. Button akan muncul lagi
+
+### Test Phone Number Format
+1. Input `0812345678` → Auto-convert ke `+62812345678`
+2. Input `812345678` → Auto-convert ke `+62812345678`
+3. Input `+62812345678` → Tetap `+62812345678`
+4. Submit form → Check database, harus `+62812345678`
 
 ### Test Public Flow
 
@@ -249,26 +354,6 @@ Setelah deploy, update `APP_BASE_URL` di Vercel environment variables dengan URL
 - **`tailwind.config.js`**: Tailwind CSS configuration
 - **`postcss.config.js`**: PostCSS configuration
 - **`vercel.json`**: Vercel deployment configuration
-
-## 📱 PWA Features
-
-### Install PWA
-
-1. Buka aplikasi di Chrome/Edge mobile
-2. Tap menu (⋮) → "Add to Home Screen"
-3. PWA akan terinstall seperti aplikasi native
-
-### Offline Support
-
-- Service worker menyimpan cache untuk offline access
-- Form pengajuan dapat diisi offline
-- Data akan sync saat online kembali
-
-### PWA Components
-
-- **Service Worker**: Offline functionality and caching
-- **Manifest**: App-like experience with icons
-- **Icons**: 192x192 and 512x512 for mobile devices
 
 ## 🎯 Admin Dashboard Features
 
