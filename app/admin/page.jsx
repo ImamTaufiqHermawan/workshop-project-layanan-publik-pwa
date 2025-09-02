@@ -200,35 +200,69 @@ export default function AdminDashboard() {
       title: "Kode Tracking",
       dataIndex: "tracking_code",
       key: "tracking_code",
-      render: (text) => <span className="font-mono text-sm">{text}</span>,
-      width: 150,
+      render: (text) => (
+        <div className="max-w-[200px] sm:max-w-[250px] lg:max-w-[300px]">
+          <span
+            className="font-mono text-xs sm:text-sm break-all leading-tight"
+            title={text}
+          >
+            {text}
+          </span>
+        </div>
+      ),
+      width: 200,
       fixed: "left",
+      responsive: ["md"],
     },
     {
       title: "Nama",
       dataIndex: "nama",
       key: "nama",
       width: 120,
+      responsive: ["md"],
+      render: (text) => (
+        <div className="max-w-[100px] sm:max-w-[120px]">
+          <span
+            className="text-xs sm:text-sm break-words leading-tight"
+            title={text}
+          >
+            {text}
+          </span>
+        </div>
+      ),
     },
     {
       title: "Jenis Layanan",
       dataIndex: "jenis_layanan",
       key: "jenis_layanan",
       width: 120,
+      responsive: ["md"],
+      render: (text) => (
+        <div className="max-w-[100px] sm:max-w-[120px]">
+          <span
+            className="text-xs sm:text-sm break-words leading-tight"
+            title={text}
+          >
+            {text}
+          </span>
+        </div>
+      ),
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
       width: 180,
+      responsive: ["md"],
       render: (status, record) => (
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
           <Select
             value={status}
-            style={{ width: 150 }}
+            style={{ width: "100%", minWidth: "120px", maxWidth: "150px" }}
             onChange={(value) => handleStatusChange(record.id, value)}
             disabled={updatingStatus[record.id]}
             loading={updatingStatus[record.id]}
+            size="small"
           >
             <Option value="PENGAJUAN_BARU">Pengajuan Baru</Option>
             <Option value="DIPROSES">Sedang Diproses</Option>
@@ -236,9 +270,9 @@ export default function AdminDashboard() {
             <Option value="DITOLAK">Ditolak</Option>
           </Select>
           {updatingStatus[record.id] && (
-            <div className="flex items-center text-blue-600 text-sm">
+            <div className="flex items-center text-blue-600 text-xs sm:text-sm">
               <svg
-                className="animate-spin h-4 w-4 mr-1"
+                className="animate-spin h-3 w-3 sm:h-4 sm:w-4 mr-1"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -257,7 +291,8 @@ export default function AdminDashboard() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Updating...
+              <span className="hidden sm:inline">Updating...</span>
+              <span className="sm:hidden">...</span>
             </div>
           )}
         </div>
@@ -268,16 +303,27 @@ export default function AdminDashboard() {
       dataIndex: "created_at",
       key: "created_at",
       width: 150,
+      responsive: ["lg"],
       render: (date) => {
         if (!date) return "-";
         try {
-          return new Date(date).toLocaleString("id-ID", {
+          const formattedDate = new Date(date).toLocaleString("id-ID", {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
           });
+          return (
+            <div className="max-w-[120px] sm:max-w-[150px]">
+              <span
+                className="text-xs sm:text-sm break-words leading-tight"
+                title={formattedDate}
+              >
+                {formattedDate}
+              </span>
+            </div>
+          );
         } catch (error) {
           return "-";
         }
@@ -288,16 +334,27 @@ export default function AdminDashboard() {
       dataIndex: "updated_at",
       key: "updated_at",
       width: 150,
+      responsive: ["lg"],
       render: (date) => {
         if (!date) return "-";
         try {
-          return new Date(date).toLocaleString("id-ID", {
+          const formattedDate = new Date(date).toLocaleString("id-ID", {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
           });
+          return (
+            <div className="max-w-[120px] sm:max-w-[150px]">
+              <span
+                className="text-xs sm:text-sm break-words leading-tight"
+                title={formattedDate}
+              >
+                {formattedDate}
+              </span>
+            </div>
+          );
         } catch (error) {
           return "-";
         }
@@ -713,7 +770,7 @@ export default function AdminDashboard() {
               dataSource={filteredSubmissions}
               rowKey="id"
               loading={loading}
-              scroll={{ x: 800, y: 400 }}
+              scroll={{ x: 1200, y: 400 }}
               pagination={{
                 pageSize: 10,
                 showSizeChanger: false,
@@ -721,9 +778,12 @@ export default function AdminDashboard() {
                 showTotal: (total, range) =>
                   `${range[0]}-${range[1]} dari ${total} pengajuan`,
                 size: "small",
+                responsive: true,
               }}
               size="small"
               className="responsive-table"
+              bordered={false}
+              tableLayout="auto"
             />
 
             {/* Loading overlay when any status is being updated */}
@@ -768,8 +828,9 @@ export default function AdminDashboard() {
 
         .responsive-table .ant-table-thead > tr > th,
         .responsive-table .ant-table-tbody > tr > td {
-          white-space: nowrap;
           padding: 8px 12px;
+          word-wrap: break-word;
+          word-break: break-word;
         }
 
         .responsive-table .ant-table-thead > tr > th {
@@ -782,6 +843,7 @@ export default function AdminDashboard() {
           background-color: #f5f5f5;
         }
 
+        /* Mobile optimizations */
         @media (max-width: 768px) {
           .responsive-table .ant-table {
             font-size: 11px;
@@ -790,10 +852,41 @@ export default function AdminDashboard() {
           .responsive-table .ant-table-thead > tr > th,
           .responsive-table .ant-table-tbody > tr > td {
             padding: 4px 6px;
+            font-size: 10px;
           }
 
           .responsive-table .ant-table-pagination {
             font-size: 11px;
+          }
+
+          .responsive-table .ant-table-scroll {
+            overflow-x: auto;
+          }
+
+          /* Ensure tracking code doesn't overflow */
+          .responsive-table .ant-table-tbody > tr > td:first-child {
+            max-width: 120px;
+            min-width: 120px;
+          }
+
+          /* Compact status column */
+          .responsive-table .ant-table-tbody > tr > td:nth-child(4) {
+            max-width: 140px;
+            min-width: 140px;
+          }
+        }
+
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+          .responsive-table .ant-table-thead > tr > th,
+          .responsive-table .ant-table-tbody > tr > td {
+            padding: 2px 4px;
+            font-size: 9px;
+          }
+
+          .responsive-table .ant-table-tbody > tr > td:first-child {
+            max-width: 100px;
+            min-width: 100px;
           }
         }
       `}</style>
