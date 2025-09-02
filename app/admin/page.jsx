@@ -50,22 +50,33 @@ export default function AdminDashboard() {
 
     try {
       // Ultra-aggressive cache bypass
+      // Ultra-aggressive cache bypass
       const timestamp = Date.now();
       const random = Math.random().toString(36).substring(7);
       const forceRefresh = Date.now();
       const cacheBuster = Math.random().toString(36).substring(7);
 
+      const forceRefresh = Date.now();
+      const cacheBuster = Math.random().toString(36).substring(7);
+
       const response = await fetch(
+        `/api/admin/submissions?t=${timestamp}&r=${random}&force=${forceRefresh}&cb=${cacheBuster}&_=${Date.now()}`,
         `/api/admin/submissions?t=${timestamp}&r=${random}&force=${forceRefresh}&cb=${cacheBuster}&_=${Date.now()}`,
         {
           headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
             "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
             Pragma: "no-cache",
             "X-Requested-With": "XMLHttpRequest",
             "X-Force-Refresh": "true",
             "X-Cache-Buster": `${timestamp}-${random}`,
             "X-Request-Time": `${Date.now()}`,
+            "X-Force-Refresh": "true",
+            "X-Cache-Buster": `${timestamp}-${random}`,
+            "X-Request-Time": `${Date.now()}`,
           },
+          // Force fresh request
+          cache: "no-store",
           // Force fresh request
           cache: "no-store",
         }
@@ -330,6 +341,7 @@ export default function AdminDashboard() {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing || loading}
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center text-sm sm:text-base mr-2"
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center text-sm sm:text-base mr-2"
               >
                 {refreshing ? (
