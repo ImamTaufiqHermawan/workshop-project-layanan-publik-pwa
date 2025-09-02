@@ -861,8 +861,8 @@ export default function AdminDashboard() {
 
           /* Ensure tracking code doesn't overflow */
           .responsive-table .ant-table-tbody > tr > td:first-child {
-            max-width: 120px;
-            min-width: 120px;
+            max-width: 80px;
+            min-width: 80px;
           }
 
           /* Compact status column */
@@ -888,8 +888,8 @@ export default function AdminDashboard() {
           }
 
           .responsive-table .ant-table-tbody > tr > td:first-child {
-            max-width: 100px;
-            min-width: 100px;
+            max-width: 70px;
+            min-width: 70px;
           }
 
           .responsive-table .ant-table-tbody > tr > td:nth-child(2),
