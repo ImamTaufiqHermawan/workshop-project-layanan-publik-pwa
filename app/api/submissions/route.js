@@ -158,7 +158,7 @@ export async function POST(request) {
       email,
       no_wa,
       consent,
-      status: "pending",
+      status: "PENGAJUAN_BARU",
     });
 
     console.log(
