@@ -201,7 +201,7 @@ export default function AdminDashboard() {
       dataIndex: "tracking_code",
       key: "tracking_code",
       render: (text) => (
-        <div className="max-w-[200px] sm:max-w-[250px] lg:max-w-[300px]">
+        <div className="max-w-[120px] sm:max-w-[200px] lg:max-w-[300px]">
           <span
             className="font-mono text-xs sm:text-sm break-all leading-tight"
             title={text}
@@ -212,16 +212,14 @@ export default function AdminDashboard() {
       ),
       width: 200,
       fixed: "left",
-      responsive: ["md"],
     },
     {
       title: "Nama",
       dataIndex: "nama",
       key: "nama",
       width: 120,
-      responsive: ["md"],
       render: (text) => (
-        <div className="max-w-[100px] sm:max-w-[120px]">
+        <div className="max-w-[80px] sm:max-w-[120px]">
           <span
             className="text-xs sm:text-sm break-words leading-tight"
             title={text}
@@ -236,9 +234,8 @@ export default function AdminDashboard() {
       dataIndex: "jenis_layanan",
       key: "jenis_layanan",
       width: 120,
-      responsive: ["md"],
       render: (text) => (
-        <div className="max-w-[100px] sm:max-w-[120px]">
+        <div className="max-w-[80px] sm:max-w-[120px]">
           <span
             className="text-xs sm:text-sm break-words leading-tight"
             title={text}
@@ -253,12 +250,11 @@ export default function AdminDashboard() {
       dataIndex: "status",
       key: "status",
       width: 180,
-      responsive: ["md"],
       render: (status, record) => (
         <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
           <Select
             value={status}
-            style={{ width: "100%", minWidth: "120px", maxWidth: "150px" }}
+            style={{ width: "100%", minWidth: "100px", maxWidth: "150px" }}
             onChange={(value) => handleStatusChange(record.id, value)}
             disabled={updatingStatus[record.id]}
             loading={updatingStatus[record.id]}
@@ -315,7 +311,7 @@ export default function AdminDashboard() {
             minute: "2-digit",
           });
           return (
-            <div className="max-w-[120px] sm:max-w-[150px]">
+            <div className="max-w-[100px] sm:max-w-[150px]">
               <span
                 className="text-xs sm:text-sm break-words leading-tight"
                 title={formattedDate}
@@ -346,7 +342,7 @@ export default function AdminDashboard() {
             minute: "2-digit",
           });
           return (
-            <div className="max-w-[120px] sm:max-w-[150px]">
+            <div className="max-w-[100px] sm:max-w-[150px]">
               <span
                 className="text-xs sm:text-sm break-words leading-tight"
                 title={formattedDate}
@@ -770,7 +766,7 @@ export default function AdminDashboard() {
               dataSource={filteredSubmissions}
               rowKey="id"
               loading={loading}
-              scroll={{ x: 1200, y: 400 }}
+              scroll={{ x: 800, y: 400 }}
               pagination={{
                 pageSize: 10,
                 showSizeChanger: false,
@@ -783,7 +779,7 @@ export default function AdminDashboard() {
               size="small"
               className="responsive-table"
               bordered={false}
-              tableLayout="auto"
+              tableLayout="fixed"
             />
 
             {/* Loading overlay when any status is being updated */}
@@ -874,6 +870,13 @@ export default function AdminDashboard() {
             max-width: 140px;
             min-width: 140px;
           }
+
+          /* Compact nama and jenis layanan columns */
+          .responsive-table .ant-table-tbody > tr > td:nth-child(2),
+          .responsive-table .ant-table-tbody > tr > td:nth-child(3) {
+            max-width: 80px;
+            min-width: 80px;
+          }
         }
 
         /* Small mobile devices */
@@ -887,6 +890,17 @@ export default function AdminDashboard() {
           .responsive-table .ant-table-tbody > tr > td:first-child {
             max-width: 100px;
             min-width: 100px;
+          }
+
+          .responsive-table .ant-table-tbody > tr > td:nth-child(2),
+          .responsive-table .ant-table-tbody > tr > td:nth-child(3) {
+            max-width: 70px;
+            min-width: 70px;
+          }
+
+          .responsive-table .ant-table-tbody > tr > td:nth-child(4) {
+            max-width: 120px;
+            min-width: 120px;
           }
         }
       `}</style>
