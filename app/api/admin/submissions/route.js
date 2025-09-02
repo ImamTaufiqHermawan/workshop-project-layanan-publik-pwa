@@ -17,6 +17,13 @@ export async function GET(request) {
     // In a real application, you would verify admin authentication here
     // For workshop purposes, we'll skip authentication
 
+    // Parse cache-busting query parameters
+    const url = new URL(request.url);
+    const queryTimestamp = url.searchParams.get("t");
+    const queryRandom = url.searchParams.get("r");
+    const queryForce = url.searchParams.get("force");
+    const queryCacheBuster = url.searchParams.get("cb");
+
     // Force fresh data dengan multiple strategies
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(7);
@@ -25,10 +32,18 @@ export async function GET(request) {
     console.log(
       `[${new Date().toISOString()}] Fetching submissions with force refresh: ${timestamp}-${random}-${forceRefresh}`
     );
+    console.log(
+      `[${new Date().toISOString()}] Query params: t=${queryTimestamp}, r=${queryRandom}, force=${queryForce}, cb=${queryCacheBuster}`
+    );
 
-    // Force fresh query dengan multiple strategies
+    // Force fresh query dengan random order strategy
+    const randomOrder = Math.random() > 0.5 ? "ASC" : "DESC";
+    console.log(
+      `[${new Date().toISOString()}] Using random order: ${randomOrder}`
+    );
+
     const submissions = await Submission.findAll({
-      order: [["created_at", "DESC"]], // Consistent order
+      order: [["created_at", randomOrder]], // Random order untuk force fresh query
       attributes: [
         "id",
         "tracking_code",
@@ -73,12 +88,22 @@ export async function GET(request) {
     response.headers.set("Vercel-CDN-Cache-Control", "no-cache");
     response.headers.set("X-Vercel-Cache", "MISS");
 
-    // Force fresh response dengan dynamic values
+    // Force fresh response dengan dynamic values dan query params
     response.headers.set("Last-Modified", new Date().toUTCString());
-    response.headers.set("ETag", `"${timestamp}-${random}-${forceRefresh}"`);
+    response.headers.set(
+      "ETag",
+      `"${timestamp}-${random}-${forceRefresh}-${queryTimestamp}-${queryRandom}"`
+    );
     response.headers.set("X-Response-Time", `${Date.now()}`);
-    response.headers.set("X-Cache-Buster", `${timestamp}-${random}`);
+    response.headers.set(
+      "X-Cache-Buster",
+      `${timestamp}-${random}-${queryCacheBuster}`
+    );
     response.headers.set("X-Force-Refresh", "true");
+    response.headers.set(
+      "X-Query-Params",
+      `${queryTimestamp}-${queryRandom}-${queryForce}`
+    );
 
     return response;
   } catch (error) {
