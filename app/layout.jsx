@@ -30,13 +30,32 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Layanan Publik" />
         
-        {/* Icons */}
-        <link rel="icon" href="/icon-192.png" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        {/* Comprehensive Favicon Support */}
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+        
+        {/* Apple Touch Icons */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="76x76" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="60x60" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="57x57" href="/icon-192.png" />
         
         {/* Windows Tiles */}
         <meta name="msapplication-TileColor" content="#0ea5e9" />
-        <meta name="msapplication-TileImage" content="/icon-192.png" />
+        <meta name="msapplication-TileImage" content="/icon-144.png" />
+        <meta name="msapplication-square70x70logo" content="/icon-70.png" />
+        <meta name="msapplication-square150x150logo" content="/icon-150.png" />
+        <meta name="msapplication-wide310x150logo" content="/icon-310x150.png" />
+        <meta name="msapplication-square310x310logo" content="/icon-310.png" />
         
         {/* Theme Colors */}
         <meta name="theme-color" content="#0ea5e9" />
@@ -50,6 +69,18 @@ export default function RootLayout({ children }) {
         {/* Security Headers */}
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="format-detection" content="telephone=no" />
+        
+        {/* Additional PWA Meta Tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Layanan Publik" />
+        
+        {/* Open Graph Meta Tags */}
+        <meta property="og:title" content="Layanan Publik PWA" />
+        <meta property="og:description" content="Sistem Layanan Publik Berbasis Progressive Web App" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="/" />
+        <meta property="og:image" content="/icon-512.png" />
       </head>
       <body className={inter.className}>
         {children}

@@ -1,0 +1,6 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <rect width="16" height="16" fill="#0ea5e9" rx="2"/>
+  <rect x="4" y="4" width="8" height="8" fill="white" rx="1"/>
+  <circle cx="8" cy="8" r="2" fill="#0ea5e9"/>
+  <text x="8" y="9" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="4" font-weight="bold">LP</text>
+</svg>
