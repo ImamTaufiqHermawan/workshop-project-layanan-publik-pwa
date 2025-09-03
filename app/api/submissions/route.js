@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Submission, initializeDatabase } from "@/lib/sequelize";
+import { formatToIndonesiaFormat } from "@/lib/phone";
 
 // Initialize database on first request
 let dbInitialized = false;
@@ -144,25 +145,28 @@ export async function POST(request) {
       );
     }
 
+    // Convert phone number to +62 format
+    const formattedPhone = formatToIndonesiaFormat(no_wa);
+
     // Generate tracking code
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
     const tracking_code = `WS-${timestamp}-${random}`;
 
-    // Create submission
+    // Create submission with formatted phone number
     const submission = await Submission.create({
       tracking_code,
       nama,
       nik,
       jenis_layanan,
       email,
-      no_wa,
+      no_wa: formattedPhone, // Use formatted phone number
       consent,
       status: "PENGAJUAN_BARU",
     });
 
     console.log(
-      `[${new Date().toISOString()}] Created submission: ${tracking_code}`
+      `[${new Date().toISOString()}] Created submission: ${tracking_code} with phone: ${formattedPhone}`
     );
 
     return NextResponse.json(

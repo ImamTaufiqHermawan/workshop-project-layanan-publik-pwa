@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatToIndonesiaFormat, isValidIndonesianPhone } from "@/lib/phone";
 
 export default function NewSubmission() {
   const router = useRouter();
@@ -18,10 +19,27 @@ export default function NewSubmission() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    let processedValue = value;
+    
+    // Auto-format phone number input
+    if (name === "no_wa") {
+      // Allow user to type +62 or start with 0
+      if (value.startsWith("+62") || value.startsWith("0")) {
+        processedValue = value;
+      } else if (value.startsWith("62")) {
+        processedValue = "+" + value;
+      } else if (value && !value.startsWith("+")) {
+        // If user types number without prefix, assume it's local format
+        processedValue = value;
+      }
+    }
+    
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : processedValue,
     }));
+    
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -49,6 +67,8 @@ export default function NewSubmission() {
 
     if (!formData.no_wa.trim()) {
       newErrors.no_wa = "Nomor WhatsApp wajib diisi";
+    } else if (!isValidIndonesianPhone(formData.no_wa)) {
+      newErrors.no_wa = "Format nomor WhatsApp tidak valid. Gunakan format +62 atau 08xxx";
     }
 
     if (!formData.jenis_layanan) {
@@ -71,12 +91,18 @@ export default function NewSubmission() {
     setIsSubmitting(true);
 
     try {
+      // Format phone number before sending
+      const submissionData = {
+        ...formData,
+        no_wa: formatToIndonesiaFormat(formData.no_wa)
+      };
+
       const response = await fetch("/api/submissions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       });
 
       const result = await response.json();
@@ -184,17 +210,27 @@ export default function NewSubmission() {
           >
             Nomor WhatsApp *
           </label>
-          <input
-            type="tel"
-            id="no_wa"
-            name="no_wa"
-            value={formData.no_wa}
-            onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
-              errors.no_wa ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="08xxxxxxxxxx"
-          />
+          <div className="relative">
+            <input
+              type="tel"
+              id="no_wa"
+              name="no_wa"
+              value={formData.no_wa}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
+                errors.no_wa ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="+62 8xx xxxx xxxx atau 08xxxxxxxxxx"
+            />
+            {formData.no_wa && (
+              <div className="absolute right-3 top-2 text-xs text-gray-500">
+                {formatToIndonesiaFormat(formData.no_wa)}
+              </div>
+            )}
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Format: +62 8xx xxxx xxxx atau 08xxxxxxxxxx
+          </p>
           {errors.no_wa && (
             <p className="mt-1 text-sm text-red-600">{errors.no_wa}</p>
           )}
