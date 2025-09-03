@@ -7,16 +7,8 @@ export default function PWAInstallButton() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [showButton, setShowButton] = useState(false);
   const [debugInfo, setDebugInfo] = useState("");
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Check if device is mobile
-    const checkMobile = () => {
-      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobile(mobile);
-      console.log('Device check:', { isMobile: mobile, userAgent: navigator.userAgent });
-    };
-
     // Check if PWA is already installed
     const checkIfInstalled = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -34,26 +26,23 @@ export default function PWAInstallButton() {
         setDebugInfo('PWA sudah terinstall');
       } else {
         setIsInstalled(false);
-        // For mobile, show button even without beforeinstallprompt
-        if (isMobile) {
-          setShowButton(true);
-          setDebugInfo('Mobile device - manual install available');
-        }
+        setShowButton(false);
+        setDebugInfo('Menunggu install prompt...');
       }
     };
 
-    // Listen for beforeinstallprompt event (mainly for desktop)
+    // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e) => {
-      console.log('beforeinstallprompt event fired', e);
+      console.log('🎉 beforeinstallprompt event fired!', e);
       e.preventDefault();
       setDeferredPrompt(e);
       setShowButton(true);
-      setDebugInfo('Install prompt tersedia');
+      setDebugInfo('Install prompt tersedia - klik tombol untuk install!');
     };
 
     // Listen for appinstalled event
     const handleAppInstalled = () => {
-      console.log('appinstalled event fired');
+      console.log('✅ appinstalled event fired');
       setIsInstalled(true);
       setShowButton(false);
       setDeferredPrompt(null);
@@ -76,7 +65,6 @@ export default function PWAInstallButton() {
     };
 
     // Check initial state
-    checkMobile();
     if (checkPWASupport()) {
       checkIfInstalled();
     }
@@ -94,30 +82,32 @@ export default function PWAInstallButton() {
       setDebugInfo('PWA membutuhkan HTTPS (kecuali localhost)');
     }
 
-    // For mobile, show button after a delay if not already shown
-    if (isMobile && !showButton) {
-      setTimeout(() => {
-        if (!isInstalled) {
-          setShowButton(true);
-          setDebugInfo('Mobile device - showing install option');
-        }
-      }, 2000); // Show after 2 seconds on mobile
-    }
+    // Log current state for debugging
+    console.log('🔍 PWA Install Button initialized');
+    console.log('Current state:', {
+      isInstalled,
+      showButton,
+      deferredPrompt: !!deferredPrompt,
+      protocol: location.protocol,
+      hostname: location.hostname
+    });
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
       mediaQuery.removeEventListener('change', checkIfInstalled);
     };
-  }, [isMobile, showButton, isInstalled]);
+  }, []);
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {
-      // Desktop install flow
-      console.log('Showing install prompt...');
+      console.log('🚀 Showing native install prompt...');
       
       try {
+        // This will show the native install prompt like Codashop
         deferredPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
         const { outcome } = await deferredPrompt.userChoice;
         console.log('Install prompt outcome:', outcome);
 
@@ -131,27 +121,13 @@ export default function PWAInstallButton() {
         setDebugInfo('Error saat install prompt');
       }
 
+      // Clear the deferredPrompt
       setDeferredPrompt(null);
       setShowButton(false);
-    } else if (isMobile) {
-      // Mobile install flow - show instructions
-      showMobileInstallInstructions();
+    } else {
+      console.log('❌ No deferred prompt available');
+      setDebugInfo('Install prompt tidak tersedia');
     }
-  };
-
-  const showMobileInstallInstructions = () => {
-    const instructions = isMobile ? 
-      'Untuk menginstall PWA:\n\n' +
-      '📱 Android (Chrome):\n' +
-      '• Tap menu ⋮ > "Add to Home screen"\n' +
-      '• Atau gunakan banner "Install app"\n\n' +
-      '🍎 iOS (Safari):\n' +
-      '• Tap share button 📤\n' +
-      '• Pilih "Add to Home Screen"\n\n' +
-      '🔄 Reload halaman jika instruksi tidak muncul' :
-      'Install instructions not available';
-
-    alert(instructions);
   };
 
   // Don't show button if PWA is installed
@@ -179,8 +155,8 @@ export default function PWAInstallButton() {
                 <p>Deferred Prompt: {deferredPrompt ? 'Available' : 'None'}</p>
                 <p>Is Installed: {isInstalled ? 'Yes' : 'No'}</p>
                 <p>Show Button: {showButton ? 'Yes' : 'No'}</p>
-                <p>Is Mobile: {isMobile ? 'Yes' : 'No'}</p>
                 <p>Protocol: {location.protocol}</p>
+                <p>Hostname: {location.hostname}</p>
                 <p>User Agent: {navigator.userAgent.substring(0, 100)}...</p>
               </div>
             </details>
@@ -207,17 +183,12 @@ export default function PWAInstallButton() {
           {debugInfo && (
             <p className="text-sm text-gray-500 mt-1">{debugInfo}</p>
           )}
-          {isMobile && !deferredPrompt && (
-            <p className="text-xs text-blue-600 mt-1">
-              📱 Tap tombol untuk instruksi install manual
-            </p>
-          )}
         </div>
         <button
           onClick={handleInstallClick}
           className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
         >
-          <span>{deferredPrompt ? 'Install Sekarang' : 'Cara Install'}</span>
+          <span>Install Sekarang</span>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>

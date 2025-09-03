@@ -3,7 +3,8 @@
 import Link from "next/link";
 import PWAInstallButton from "./components/PWAInstallButton";
 import PWAStatus from "./components/PWAStatus";
-import MobileInstallGuide from "./components/MobileInstallGuide";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWADebugger from "./components/PWADebugger";
 
 export default function Home() {
   
@@ -19,8 +20,14 @@ export default function Home() {
           </p>
         </div>
 
+        {/* PWA Debugger - For troubleshooting */}
+        <PWADebugger />
+
         {/* PWA Status Checker */}
         <PWAStatus />
+
+        {/* PWA Install Prompt - Testing Component */}
+        <PWAInstallPrompt />
 
         {/* PWA Install Button */}
         <PWAInstallButton />
@@ -72,9 +79,6 @@ export default function Home() {
           <p className="mt-1">Workshop-Friendly System</p>
         </div>
       </div>
-
-      {/* Mobile Install Guide - Fixed position at bottom */}
-      <MobileInstallGuide />
     </div>
   );
 }
