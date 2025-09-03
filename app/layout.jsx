@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Layanan Publik" />
         
-        {/* Comprehensive Favicon Support */}
+        {/* Comprehensive Favicon Support - PNG for Vercel */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
@@ -38,18 +38,18 @@ export default function RootLayout({ children }) {
         <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
         
-        {/* Apple Touch Icons */}
-        <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="152x152" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="144x144" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="120x120" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="114x114" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="76x76" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="72x72" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="60x60" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="57x57" href="/icon-192.png" />
+        {/* Apple Touch Icons - PNG */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icon-152.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="/icon-120.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="/icon-114.png" />
+        <link rel="apple-touch-icon" sizes="76x76" href="/icon-76.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="/icon-72.png" />
+        <link rel="apple-touch-icon" sizes="60x60" href="/icon-60.png" />
+        <link rel="apple-touch-icon" sizes="57x57" href="/icon-57.png" />
         
-        {/* Windows Tiles */}
+        {/* Windows Tiles - PNG */}
         <meta name="msapplication-TileColor" content="#0ea5e9" />
         <meta name="msapplication-TileImage" content="/icon-144.png" />
         <meta name="msapplication-square70x70logo" content="/icon-70.png" />
