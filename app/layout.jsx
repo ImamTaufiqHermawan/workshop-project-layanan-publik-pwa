@@ -62,24 +62,6 @@ export default function RootLayout({ children }) {
                     });
                 });
               }
-              
-              // PWA Install Prompt
-              let deferredPrompt;
-              window.addEventListener('beforeinstallprompt', (e) => {
-                console.log('PWA install prompt ready');
-                e.preventDefault();
-                deferredPrompt = e;
-                
-                // Show install button if needed
-                if (window.showInstallPrompt) {
-                  window.showInstallPrompt();
-                }
-              });
-              
-              window.addEventListener('appinstalled', () => {
-                console.log('PWA was installed');
-                deferredPrompt = null;
-              });
             `,
           }}
         />

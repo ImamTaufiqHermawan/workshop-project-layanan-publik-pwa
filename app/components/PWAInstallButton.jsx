@@ -6,35 +6,68 @@ export default function PWAInstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showButton, setShowButton] = useState(false);
+  const [debugInfo, setDebugInfo] = useState("");
 
   useEffect(() => {
     // Check if PWA is already installed
     const checkIfInstalled = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches || 
-          window.navigator.standalone === true) {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isIOSStandalone = window.navigator.standalone === true;
+      
+      console.log('PWA Install Check:', {
+        isStandalone,
+        isIOSStandalone,
+        userAgent: navigator.userAgent
+      });
+      
+      if (isStandalone || isIOSStandalone) {
         setIsInstalled(true);
         setShowButton(false);
+        setDebugInfo('PWA sudah terinstall');
       } else {
         setIsInstalled(false);
+        setDebugInfo('PWA belum terinstall');
       }
     };
 
     // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e) => {
+      console.log('beforeinstallprompt event fired', e);
       e.preventDefault();
       setDeferredPrompt(e);
       setShowButton(true);
+      setDebugInfo('Install prompt tersedia');
     };
 
     // Listen for appinstalled event
     const handleAppInstalled = () => {
+      console.log('appinstalled event fired');
       setIsInstalled(true);
       setShowButton(false);
       setDeferredPrompt(null);
+      setDebugInfo('PWA berhasil diinstall');
+    };
+
+    // Check if browser supports PWA installation
+    const checkPWASupport = () => {
+      const isSupported = 'serviceWorker' in navigator && 'PushManager' in window;
+      console.log('PWA Support Check:', {
+        serviceWorker: 'serviceWorker' in navigator,
+        pushManager: 'PushManager' in window,
+        isSupported
+      });
+      
+      if (!isSupported) {
+        setDebugInfo('Browser tidak mendukung PWA');
+        return false;
+      }
+      return true;
     };
 
     // Check initial state
-    checkIfInstalled();
+    if (checkPWASupport()) {
+      checkIfInstalled();
+    }
 
     // Add event listeners
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -44,6 +77,11 @@ export default function PWAInstallButton() {
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
     mediaQuery.addEventListener('change', checkIfInstalled);
 
+    // Debug: Check if we're on HTTPS
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      setDebugInfo('PWA membutuhkan HTTPS (kecuali localhost)');
+    }
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
@@ -52,18 +90,27 @@ export default function PWAInstallButton() {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      console.log('No deferred prompt available');
+      return;
+    }
 
+    console.log('Showing install prompt...');
+    
     // Show the install prompt
     deferredPrompt.prompt();
 
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
 
+    console.log('Install prompt outcome:', outcome);
+
     if (outcome === 'accepted') {
       console.log('User accepted the install prompt');
+      setDebugInfo('User menerima install prompt');
     } else {
       console.log('User dismissed the install prompt');
+      setDebugInfo('User menolak install prompt');
     }
 
     // Clear the deferredPrompt
@@ -73,7 +120,25 @@ export default function PWAInstallButton() {
 
   // Don't show button if PWA is installed or no prompt available
   if (!showButton || isInstalled) {
-    return null;
+    return (
+      <div className="bg-gray-100 rounded-lg border p-4 mb-6">
+        <div className="text-center text-gray-600">
+          <p className="text-sm">{debugInfo || 'PWA Install Button'}</p>
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mt-2 text-xs">
+              <summary className="cursor-pointer">Debug Info</summary>
+              <div className="mt-2 text-left bg-white p-2 rounded border">
+                <p>Deferred Prompt: {deferredPrompt ? 'Available' : 'None'}</p>
+                <p>Is Installed: {isInstalled ? 'Yes' : 'No'}</p>
+                <p>Show Button: {showButton ? 'Yes' : 'No'}</p>
+                <p>Protocol: {location.protocol}</p>
+                <p>User Agent: {navigator.userAgent.substring(0, 100)}...</p>
+              </div>
+            </details>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -90,6 +155,9 @@ export default function PWAInstallButton() {
           <p className="text-gray-900 font-medium">
             Tambahkan Layanan Masyarakat ke home screen Anda dengan akses 1-klik
           </p>
+          {debugInfo && (
+            <p className="text-sm text-gray-500 mt-1">{debugInfo}</p>
+          )}
         </div>
         <button
           onClick={handleInstallClick}
