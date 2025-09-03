@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import PWAForceInstall from "./components/PWAForceInstall";
+import PWAAggressiveInstall from "./components/PWAAggressiveInstall";
 import PWAStatus from "./components/PWAStatus";
 import PWADebugger from "./components/PWADebugger";
 import PWABannerTrigger from "./components/PWABannerTrigger";
@@ -29,8 +29,8 @@ export default function Home() {
         {/* PWA Status Checker */}
         <PWAStatus />
 
-        {/* PWA Force Install - Main component */}
-        <PWAForceInstall />
+        {/* PWA Aggressive Install - Main component */}
+        <PWAAggressiveInstall />
 
         <div className="space-y-4">
           <Link

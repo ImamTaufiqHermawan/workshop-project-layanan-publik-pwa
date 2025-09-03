@@ -21,15 +21,35 @@ export default function RootLayout({ children }) {
   return (
     <html lang="id">
       <head>
+        {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
+        
+        {/* PWA Meta Tags */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Layanan Publik" />
+        
+        {/* Icons */}
+        <link rel="icon" href="/icon-192.png" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        
+        {/* Windows Tiles */}
         <meta name="msapplication-TileColor" content="#0ea5e9" />
         <meta name="msapplication-TileImage" content="/icon-192.png" />
+        
+        {/* Theme Colors */}
         <meta name="theme-color" content="#0ea5e9" />
+        <meta name="msapplication-navbutton-color" content="#0ea5e9" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        
+        {/* PWA Categories */}
+        <meta name="application-name" content="Layanan Publik PWA" />
+        <meta name="msapplication-tooltip" content="Layanan Publik PWA" />
+        
+        {/* Security Headers */}
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="format-detection" content="telephone=no" />
       </head>
       <body className={inter.className}>
         {children}
