@@ -2,7 +2,7 @@
 
 import NewSubmission from "./public/components/NewSubmission";
 import StatusCheck from "./public/components/StatusCheck";
-import PWADebugInstall from "./components/PWADebugInstall";
+import PWARealInstall from "./components/PWARealInstall";
 
 export default function Home() {
   return (
@@ -37,8 +37,8 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          {/* PWA Debug & Install Component */}
-          <PWADebugInstall />
+          {/* PWA Real Install Component - BUKAN Add to Home Screen */}
+          <PWARealInstall />
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
