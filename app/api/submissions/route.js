@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { Submission, initializeDatabase } from "@/lib/sequelize";
-import { formatToIndonesiaFormat } from "@/lib/phone";
+
+const { Submission, initializeDatabase } = require("@/lib/sequelize");
+const { formatToIndonesiaFormat } = require("@/lib/phone-utils");
 
 // Initialize database on first request
 let dbInitialized = false;

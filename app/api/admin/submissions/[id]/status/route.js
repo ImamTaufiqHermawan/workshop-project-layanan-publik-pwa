@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import {
+
+const {
   Submission,
   NotificationLog,
   initializeDatabase,
-} from "@/lib/sequelize";
-import { sendStatusUpdateNotification } from "@/lib/notify/twilio";
-import { sendStatusUpdateEmail } from "@/lib/notify/email";
+} = require("@/lib/sequelize");
+const { sendStatusUpdateNotification } = require("@/lib/notify/twilio");
+const { sendStatusUpdateEmail } = require("@/lib/notify/email");
 
 // Initialize database on first request
 let dbInitialized = false;

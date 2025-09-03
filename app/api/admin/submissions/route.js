@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { Submission, initializeDatabase } from "@/lib/sequelize";
+
+const { Submission, initializeDatabase } = require("@/lib/sequelize");
 
 // Initialize database on first request
 let dbInitialized = false;
