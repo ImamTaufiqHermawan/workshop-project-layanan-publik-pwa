@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* PWA specific styles */
+.pwa-install-button {
+  transition: all 0.3s ease;
+}
+
+.pwa-install-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+  .mobile-install-guide {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    z-index: 50;
+  }
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
