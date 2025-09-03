@@ -2,7 +2,7 @@
 
 import NewSubmission from "./public/components/NewSubmission";
 import StatusCheck from "./public/components/StatusCheck";
-import PWASimpleInstall from "./components/PWASimpleInstall";
+import PWASmartInstall from "./components/PWASmartInstall";
 
 export default function Home() {
   return (
@@ -38,7 +38,7 @@ export default function Home() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           {/* PWA Install Component */}
-          <PWASimpleInstall />
+          <PWASmartInstall />
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
