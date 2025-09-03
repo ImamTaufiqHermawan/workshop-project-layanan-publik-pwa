@@ -1,84 +1,79 @@
 "use client";
 
-import Link from "next/link";
-import PWAAggressiveInstall from "./components/PWAAggressiveInstall";
-import PWAStatus from "./components/PWAStatus";
-import PWADebugger from "./components/PWADebugger";
-import PWABannerTrigger from "./components/PWABannerTrigger";
+import NewSubmission from "./public/components/NewSubmission";
+import StatusCheck from "./public/components/StatusCheck";
+import PWASimpleInstall from "./components/PWASimpleInstall";
 
 export default function Home() {
-  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      {/* PWA Banner Trigger - Fixed at top */}
-      <PWABannerTrigger />
-      
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Layanan Publik PWA
-          </h1>
-          <p className="text-gray-600">
-            Sistem Layanan Publik Berbasis Progressive Web App
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h1 className="text-2xl font-bold text-gray-900">Layanan Masyarakat</h1>
+                <p className="text-sm text-gray-500">Sistem Layanan Publik Berbasis Progressive Web App</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <a
+                href="/admin"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              >
+                Login Admin
+              </a>
+            </div>
+          </div>
         </div>
+      </header>
 
-        {/* PWA Debugger - For troubleshooting */}
-        <PWADebugger />
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          {/* PWA Install Component */}
+          <PWASimpleInstall />
 
-        {/* PWA Status Checker */}
-        <PWAStatus />
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* New Submission */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  Ajukan Layanan Baru
+                </h3>
+                <NewSubmission />
+              </div>
+            </div>
 
-        {/* PWA Aggressive Install - Main component */}
-        <PWAAggressiveInstall />
-
-        <div className="space-y-4">
-          <Link
-            href="/admin/login"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            Login Admin
-          </Link>
-
-          <Link
-            href="/public"
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            Layanan Masyarakat
-          </Link>
+            {/* Status Check */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  Cek Status Layanan
+                </h3>
+                <StatusCheck />
+              </div>
+            </div>
+          </div>
         </div>
+      </main>
 
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>© 2024 Layanan Publik PWA</p>
-          <p className="mt-1">Workshop-Friendly System</p>
+      {/* Footer */}
+      <footer className="bg-white border-t">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-sm text-gray-500">
+            <p>© 2024 Layanan Publik PWA</p>
+            <p className="mt-1">Workshop-Friendly System</p>
+          </div>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
