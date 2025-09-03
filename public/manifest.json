@@ -9,7 +9,10 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "id",
-  "categories": ["government", "utilities"],
+  "categories": [
+    "government",
+    "utilities"
+  ],
   "prefer_related_applications": false,
   "related_applications": [],
   "edge_side_panel": {
@@ -186,5 +189,7 @@
         }
       ]
     }
-  ]
+  ],
+  "version": "1.0.1756916647455",
+  "timestamp": "2025-09-03T16:24:07.455Z"
 }
